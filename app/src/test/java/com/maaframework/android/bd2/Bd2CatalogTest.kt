@@ -20,6 +20,7 @@ class Bd2CatalogTest {
     @Test fun `upstream Android catalog keeps runnable tasks and both resource layers`() {
         assertTrue(catalog.tasks.size > 20)
         assertEquals(setOf("ADB"), catalog.resources.map { it.id }.toSet())
+        assertEquals(listOf("./resource/base", "./resource/android_native"), catalog.resources.single().paths)
         assertTrue(catalog.tasks.all { it.controllerSupported })
         assertTrue(catalog.tasks.any { it.id == manifest.defaultTaskId })
         val checked = MaaHostViewModel.defaultCheckedTaskIds(catalog.tasks, manifest.defaultTaskId)
