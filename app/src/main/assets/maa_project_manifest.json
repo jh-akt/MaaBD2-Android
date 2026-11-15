@@ -107,7 +107,6 @@
       "resource/base/model/ocr/det.onnx",
       "python/bin/python3",
       "python/lib/libpython3.13.so",
-      "python/lib/python3.13/site-packages/cv2.so",
       "python/lib/python3.13/site-packages/maa/agent/agent_server.py",
       "python/lib/python3.13/site-packages/numpy/_utils/__init__.py",
       "python/lib/python3.13/site-packages/numpy/_core/__init__.py",
@@ -115,7 +114,9 @@
       "maafw/libMaaAgentClient.so",
       "maafw/libMaaAgentServer.so",
       "maafw/libMaaAndroidNativeControlUnit.so",
-      "maafw/libonnxruntime.so"
+      "maafw/libonnxruntime.so",
+      "python/lib/python3.13/site-packages/PIL/__init__.py",
+      "python/lib/python3.13/site-packages/strenum/__init__.py"
     ],
     "executable_paths": [
       "python/bin/python3"
