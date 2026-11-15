@@ -64,13 +64,6 @@
         "target": "agent-core.json"
       },
       {
-        "archives": [
-          "assets/agent/bundle.zip"
-        ],
-        "source": "arm64-v8a/licenses/",
-        "target": "licenses"
-      },
-      {
         "source": "lib/arm64-v8a/",
         "target": "maafw",
         "include": "(libMaa[^/]+|libc\\+\\+_shared|libonnxruntime|libopencv_world4|libfastdeploy_ppocr)\\.so"

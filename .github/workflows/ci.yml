@@ -36,10 +36,15 @@ jobs:
           path: .cache/*.apk
           key: maabd2-upstream-${{ hashFiles('upstream.lock.json') }}
       - name: Test payload preparation
-        run: python3 -m unittest discover -s tools -p 'test_*.py'
+        run: |
+          python3 -m unittest discover -s tools -p 'test_*.py'
+          python3 tools/prepare_upstream.py
       - name: Build and test
         run: |
           set +e
+          export MAA_RELEASE_FIXTURE="$PWD/.cache/$(python3 -c 'import json; print(json.load(open("upstream.lock.json"))["url"].rsplit("/", 1)[-1])')"
+          export MAA_PROJECT_MANIFEST="$PWD/app/src/main/assets/maa_project_manifest.json"
+          export MAA_OVERLAY_DIR="$PWD/app/src/main/assets/project_overlay"
           ./gradlew :app:assembleDebug :app:testDebugUnitTest :framework:testDebugUnitTest :framework-host:testDebugUnitTest --no-daemon > ci-build.log 2>&1
           result=$?
           cat ci-build.log
