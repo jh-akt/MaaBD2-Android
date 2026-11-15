@@ -116,7 +116,9 @@
       "maafw/libMaaAndroidNativeControlUnit.so",
       "maafw/libonnxruntime.so",
       "python/lib/python3.13/site-packages/PIL/__init__.py",
-      "python/lib/python3.13/site-packages/strenum/__init__.py"
+      "python/lib/python3.13/site-packages/strenum/__init__.py",
+      "python/lib/python3.13/site-packages/chaquopy/lib/libjpeg_chaquopy.so",
+      "python/lib/python3.13/site-packages/chaquopy/lib/libfreetype.so"
     ],
     "executable_paths": [
       "python/bin/python3"

@@ -26,15 +26,24 @@ for resource in interface["resource"]:
         if not task.get("resource") or resource["name"] in task["resource"]:
             assert task["entry"] in nodes, f'Missing entry {task["entry"]} for {resource["name"]}'
 binaries = [p for p in runtime.rglob("*") if p.is_file() and (".so" in p.name or p.name == "python3")]
-provided = {p.name for p in binaries}
+# Match the shared host's LD_LIBRARY_PATH. A file elsewhere in the payload is
+# insufficient: the Android linker also needs a search path to that directory.
+library_paths = [runtime / "maafw", runtime / "python/lib",
+                 runtime / "python/lib/python3.13/site-packages/chaquopy/lib"]
 system = {"libm.so", "libdl.so", "libc.so", "liblog.so", "libmediandk.so", "libz.so", "libandroid.so"}
 symbols = set()
 for binary in binaries:
     header = subprocess.check_output(["readelf", "-h", str(binary)], text=True)
     assert "AArch64" in header, f"Wrong ABI: {binary}"
     dynamic = subprocess.check_output(["readelf", "-d", str(binary)], text=True)
+    search_paths = list(library_paths)
+    for runpath in re.findall(r"\(RUNPATH\).*?\[(.*?)\]", dynamic):
+        for item in runpath.split(":"):
+            expanded = item.replace("${ORIGIN}", str(binary.resolve().parent)).replace("$ORIGIN", str(binary.resolve().parent))
+            assert "$" not in expanded and Path(expanded).is_absolute(), f"Unsupported RUNPATH: {binary}: {item}"
+            search_paths.append(Path(expanded))
     for library in re.findall(r"\(NEEDED\).*?\[(.*?)\]", dynamic):
-        assert library in provided | system, f"Unresolved dependency {library}: {binary}"
+        assert library in system or any((directory / library).is_file() for directory in search_paths), f"Unresolved dependency {library}: {binary}"
     if binary.parent.name == "maafw":
         exported = subprocess.check_output(["nm", "-D", "--defined-only", str(binary)], text=True)
         symbols.update(re.findall(r"\b(Maa\w+)$", exported, re.MULTILINE))
