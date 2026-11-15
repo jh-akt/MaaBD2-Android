@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Check portable source paths
+        run: python3 MaaFramework-Android/tools/check_portable_paths.py .
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v6
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install Android SDK 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
+      - uses: actions/cache@v4
+        with:
+          path: .cache/*.apk
+          key: maabd2-upstream-${{ hashFiles('upstream.lock.json') }}
+      - name: Test payload preparation
+        run: python3 -m unittest discover -s tools -p 'test_*.py'
+      - name: Build and test
+        run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :framework:testDebugUnitTest :framework-host:testDebugUnitTest --no-daemon
+      - name: Verify packaged runtime and resources
+        run: python3 tools/verify_payload.py --apk app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MaaBD2-Android-debug
+          path: app/build/outputs/apk/debug/app-debug.apk

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "operations": [
+    {
+      "op": "copy",
+      "file": "agent/android_entry.py",
+      "asset": "android_entry.py"
+    },
+    {
+      "op": "json_set",
+      "file": "interface.json",
+      "path": [
+        "agent"
+      ],
+      "value": {
+        "child_exec": "python3",
+        "child_args": [
+          "-u",
+          "agent/android_entry.py"
+        ]
+      }
+    }
+  ]
+}
