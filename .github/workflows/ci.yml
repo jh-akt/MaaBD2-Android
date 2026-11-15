@@ -38,7 +38,20 @@ jobs:
       - name: Test payload preparation
         run: python3 -m unittest discover -s tools -p 'test_*.py'
       - name: Build and test
-        run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :framework:testDebugUnitTest :framework-host:testDebugUnitTest --no-daemon
+        run: |
+          set +e
+          ./gradlew :app:assembleDebug :app:testDebugUnitTest :framework:testDebugUnitTest :framework-host:testDebugUnitTest --no-daemon > ci-build.log 2>&1
+          result=$?
+          cat ci-build.log
+          if [ "$result" -ne 0 ]; then
+            python3 - <<'PY'
+          from pathlib import Path
+          text = "\n".join(Path("ci-build.log").read_text(errors="replace").splitlines()[-65:])
+          text = text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+          print("::error title=Build and test failed::" + text)
+          PY
+          fi
+          exit "$result"
       - name: Verify packaged runtime and resources
         run: python3 tools/verify_payload.py --apk app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
