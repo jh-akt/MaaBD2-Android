@@ -2,7 +2,7 @@
 """Import the pinned upstream Android payload, never the upstream Android shell.
 
 The APK is used as the reproducible distribution of Android-adapted PI resources,
-CPython/OpenCV/NumPy and matching MaaFramework libraries. Source: upstream.lock.json.
+CPython/NumPy/Pillow and matching MaaFramework libraries. Source: upstream.lock.json.
 """
 from __future__ import annotations
 

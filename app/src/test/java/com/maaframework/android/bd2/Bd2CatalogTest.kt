@@ -18,7 +18,7 @@ class Bd2CatalogTest {
         .loadFromDirectory(File(assets, "project"))
 
     @Test fun `upstream Android catalog keeps runnable tasks and both resource layers`() {
-        assertTrue(catalog.tasks.size > 20)
+        assertEquals(20, catalog.tasks.size)
         assertEquals(setOf("ADB"), catalog.resources.map { it.id }.toSet())
         assertEquals(listOf("./resource/base", "./resource/android_native"), catalog.resources.single().paths)
         assertTrue(catalog.tasks.all { it.controllerSupported })
@@ -42,7 +42,7 @@ class Bd2CatalogTest {
 
     @Test fun `task options and presets survive shared host parsing`() {
         assertTrue(catalog.tasks.first { it.id == "[执行]快速狩猎扫荡" }.options.isNotEmpty())
-        assertTrue(catalog.presets.isNotEmpty())
+        assertEquals(3, catalog.presets.size)
         val ids = catalog.tasks.map { it.id }.toSet()
         assertTrue(catalog.presets.all { preset -> preset.taskIds.all { it in ids } })
         assertTrue(catalog.tasks.none { it.id.contains("PC") || it.id == "多存档" })
